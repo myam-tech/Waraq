@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورق — إضافة محتوى</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1209;
+    --cream: #f5f0e8;
+    --warm: #f0e6d0;
+    --gold: #c9973a;
+    --gold-light: #e8b84b;
+    --rust: #b84c2a;
+    --sage: #4a7c59;
+    --muted: #8c7b68;
+    --card-bg: #fffdf7;
+    --border: rgba(139,110,60,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'IBM Plex Sans Arabic',sans-serif; background:var(--cream); color:var(--ink); min-height:100vh; }
+  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; }
+
+  .app-shell { display:flex; height:100vh; max-width:1400px; margin:0 auto; }
+
+  /* SIDEBAR */
+  .sidebar { width:260px; flex-shrink:0; background:var(--ink); padding:32px 24px; display:flex; flex-direction:column; gap:4px; position:relative; overflow:hidden; }
+  .sidebar::before { content:''; position:absolute; top:-100px; left:-100px; width:400px; height:400px; background:radial-gradient(circle,rgba(201,151,58,.12) 0%,transparent 70%); pointer-events:none; }
+  .logo { display:flex; align-items:center; gap:12px; margin-bottom:32px; padding-bottom:24px; border-bottom:1px solid rgba(255,255,255,.08); }
+  .logo-icon { width:44px; height:44px; background:var(--gold); border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'Amiri',serif; font-size:22px; color:var(--ink); font-weight:700; }
+  .logo-text { font-family:'Amiri',serif; font-size:26px; color:var(--cream); line-height:1; }
+  .logo-sub { font-size:10px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+  .nav-item { display:flex; align-items:center; gap:14px; padding:12px 16px; border-radius:10px; cursor:pointer; color:rgba(255,255,255,.5); font-size:14px; transition:all .2s; text-decoration:none; }
+  .nav-item:hover { background:rgba(255,255,255,.06); color:rgba(255,255,255,.85); }
+  .nav-item.active { background:rgba(201,151,58,.15); color:var(--gold-light); font-weight:600; }
+  .nav-icon { width:20px; height:20px; flex-shrink:0; }
+  .nav-section-label { font-size:10px; color:rgba(255,255,255,.2); letter-spacing:2px; text-transform:uppercase; padding:16px 16px 6px; }
+  .sidebar-bottom { margin-top:auto; border-top:1px solid rgba(255,255,255,.08); padding-top:20px; }
+  .user-row { display:flex; align-items:center; gap:12px; padding:10px 16px; border-radius:10px; cursor:pointer; transition:background .2s; }
+  .user-row:hover { background:rgba(255,255,255,.06); }
+  .u-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--rust)); display:flex; align-items:center; justify-content:center; font-size:15px; color:white; font-weight:700; }
+  .u-name { font-size:13px; color:rgba(255,255,255,.8); font-weight:500; }
+  .u-streak { font-size:11px; color:var(--gold); margin-top:1px; }
+
+  /* MAIN */
+  .main { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+  .main::-webkit-scrollbar { width:4px; }
+  .main::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+  /* PAGE HEADER */
+  .page-header {
+    background:var(--ink); padding:36px 48px 32px;
+    position:relative; overflow:hidden; flex-shrink:0;
+  }
+  .page-header::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent,transparent 30px,rgba(201,151,58,.04) 30px,rgba(201,151,58,.04) 31px),repeating-linear-gradient(-45deg,transparent,transparent 30px,rgba(201,151,58,.04) 30px,rgba(201,151,58,.04) 31px); pointer-events:none; }
+  .page-header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(transparent,var(--cream)); }
+  .ph-inner { position:relative; z-index:2; }
+  .ph-title { font-family:'Amiri',serif; font-size:36px; color:var(--cream); margin-bottom:8px; animation:fadeDown .5s ease both; }
+  .ph-sub { font-size:13px; color:rgba(240,230,208,.5); max-width:500px; line-height:1.7; animation:fadeDown .5s ease both .08s; }
+
+  /* GUIDELINES PILLS */
+  .guidelines {
+    display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;
+    animation:fadeDown .5s ease both .14s;
+  }
+  .guide-pill { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:100px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); font-size:11px; color:rgba(240,230,208,.6); }
+  .guide-pill span { color:var(--gold-light); }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+  /* BODY */
+  .page-body { display:flex; flex:1; gap:0; padding:32px 48px; overflow:hidden; }
+
+  /* FORM AREA */
+  .form-area { flex:1; display:flex; flex-direction:column; gap:0; overflow-y:auto; padding-left:32px; }
+  .form-area::-webkit-scrollbar { display:none; }
+
+  /* TYPE SELECTOR */
+  .type-selector { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:28px; animation:fadeUp .45s ease both .05s; }
+
+  .type-card {
+    background:var(--card-bg); border:2px solid var(--border);
+    border-radius:16px; padding:20px 16px; cursor:pointer;
+    text-align:center; transition:all .25s; position:relative; overflow:hidden;
+  }
+  .type-card::before { content:''; position:absolute; inset:0; opacity:0; transition:opacity .25s; }
+  .type-card:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(26,18,9,.1); }
+  .type-card.selected { border-color:var(--gold); background:var(--warm); }
+  .type-card.selected::before { opacity:1; }
+
+  .tc-book::before { background:radial-gradient(circle at top right,rgba(74,124,89,.08),transparent 60%); }
+  .tc-podcast::before { background:radial-gradient(circle at top right,rgba(123,60,200,.08),transparent 60%); }
+  .tc-quote::before { background:radial-gradient(circle at top right,rgba(201,151,58,.1),transparent 60%); }
+
+  .tc-icon { font-size:32px; margin-bottom:10px; display:block; }
+  .tc-name { font-size:14px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+  .tc-desc { font-size:11px; color:var(--muted); line-height:1.5; }
+  .tc-check { position:absolute; top:10px; left:10px; width:20px; height:20px; border-radius:50%; background:var(--gold); display:none; align-items:center; justify-content:center; font-size:11px; color:white; font-weight:700; }
+  .type-card.selected .tc-check { display:flex; }
+
+  /* FORM CARD */
+  .form-card {
+    background:var(--card-bg); border:1px solid var(--border);
+    border-radius:20px; padding:28px; margin-bottom:20px;
+    animation:fadeUp .45s ease both;
+  }
+
+  .section-label {
+    font-size:11px; font-weight:700; color:var(--muted);
+    letter-spacing:1.5px; text-transform:uppercase;
+    margin-bottom:18px; display:flex; align-items:center; gap:8px;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* FIELDS */
+  .field { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+  .field:last-child { margin-bottom:0; }
+  .field label { font-size:12px; font-weight:600; color:var(--ink); }
+  .field-hint { font-size:11px; color:var(--muted); margin-top:2px; }
+
+  .field input, .field select, .field textarea {
+    width:100%; padding:12px 16px;
+    border:1.5px solid var(--border); border-radius:12px;
+    background:var(--cream); color:var(--ink);
+    font-size:14px; font-family:'IBM Plex Sans Arabic',sans-serif;
+    transition:all .2s; direction:rtl; outline:none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,151,58,.1); }
+  .field textarea { resize:vertical; min-height:120px; line-height:1.7; }
+  .field select { cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238c7b68' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:left 14px center; }
+
+  /* CHAR COUNTER */
+  .field-footer { display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+  .char-counter { font-size:11px; color:var(--muted); }
+  .char-counter.warn { color:var(--rust); }
+
+  /* TAGS INPUT */
+  .tags-wrap {
+    display:flex; flex-wrap:wrap; gap:6px;
+    padding:10px 14px; border:1.5px solid var(--border);
+    border-radius:12px; background:var(--cream); cursor:text;
+    min-height:48px; align-items:center; transition:border-color .2s;
+  }
+  .tags-wrap:focus-within { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,151,58,.1); }
+  .tag-item { display:flex; align-items:center; gap:4px; padding:4px 10px; background:var(--ink); color:var(--gold-light); border-radius:100px; font-size:12px; font-weight:500; }
+  .tag-remove { background:none; border:none; color:rgba(232,184,75,.6); cursor:pointer; font-size:14px; line-height:1; padding:0 2px; transition:color .15s; }
+  .tag-remove:hover { color:var(--gold-light); }
+  .tag-input { border:none; background:transparent; outline:none; font-size:13px; color:var(--ink); font-family:'IBM Plex Sans Arabic',sans-serif; min-width:80px; flex:1; direction:rtl; }
+  .tag-input::placeholder { color:rgba(140,123,104,.5); }
+
+  /* BOOK FIELDS */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+  /* AUDIO UPLOAD */
+  .upload-zone {
+    border:2px dashed var(--border); border-radius:14px;
+    padding:32px; text-align:center; cursor:pointer;
+    transition:all .25s; background:var(--cream);
+  }
+  .upload-zone:hover { border-color:var(--gold); background:var(--warm); }
+  .upload-zone.dragover { border-color:var(--gold); background:rgba(201,151,58,.06); transform:scale(1.01); }
+  .uz-icon { font-size:40px; margin-bottom:12px; }
+  .uz-title { font-size:14px; font-weight:600; color:var(--ink); margin-bottom:4px; }
+  .uz-sub { font-size:12px; color:var(--muted); }
+  .uz-formats { display:flex; justify-content:center; gap:8px; margin-top:12px; }
+  .uz-fmt { padding:3px 10px; border-radius:100px; background:var(--warm); border:1px solid var(--border); font-size:10px; color:var(--muted); font-weight:600; }
+
+  /* FILE SELECTED STATE */
+  .file-selected { display:none; align-items:center; gap:16px; padding:16px; background:var(--warm); border-radius:12px; border:1px solid var(--border); margin-top:12px; }
+  .file-selected.show { display:flex; }
+  .fs-icon { font-size:28px; flex-shrink:0; }
+  .fs-name { font-size:13px; font-weight:600; color:var(--ink); }
+  .fs-size { font-size:11px; color:var(--muted); margin-top:2px; }
+  .fs-remove { margin-right:auto; background:none; border:none; color:var(--rust); cursor:pointer; font-size:20px; line-height:1; }
+
+  /* EXCERPT PREVIEW */
+  .excerpt-preview {
+    background:linear-gradient(135deg,rgba(201,151,58,.06),rgba(201,151,58,.02));
+    border:1px solid rgba(201,151,58,.2);
+    border-radius:14px; padding:20px;
+    margin-top:16px;
+    display:none;
+  }
+  .excerpt-preview.show { display:block; }
+  .ep-label { font-size:10px; color:var(--gold); font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; }
+  .ep-text { font-family:'Amiri',serif; font-size:17px; line-height:1.9; color:var(--ink); border-right:3px solid var(--gold); padding-right:14px; }
+
+  /* SUBMISSION GUIDELINES */
+  .guidelines-box {
+    background:var(--warm); border:1px solid var(--border);
+    border-radius:14px; padding:18px; margin-bottom:20px;
+    animation:fadeUp .45s ease both .1s;
+  }
+  .gb-title { font-size:12px; font-weight:700; color:var(--ink); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+  .gb-list { display:flex; flex-direction:column; gap:6px; }
+  .gb-item { display:flex; align-items:flex-start; gap:8px; font-size:12px; color:var(--muted); line-height:1.5; }
+  .gb-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:5px; }
+
+  /* SUBMIT AREA */
+  .submit-area { display:flex; gap:12px; align-items:center; margin-top:4px; animation:fadeUp .45s ease both .15s; }
+  .btn-submit { flex:1; padding:14px; background:var(--ink); color:var(--gold-light); border:none; border-radius:12px; cursor:pointer; font-size:15px; font-weight:700; font-family:'IBM Plex Sans Arabic',sans-serif; transition:all .25s; position:relative; overflow:hidden; }
+  .btn-submit:hover { background:#2d1f0e; transform:translateY(-1px); box-shadow:0 8px 24px rgba(26,18,9,.2); }
+  .btn-draft { padding:14px 24px; background:transparent; color:var(--muted); border:1.5px solid var(--border); border-radius:12px; cursor:pointer; font-size:14px; font-weight:500; font-family:'IBM Plex Sans Arabic',sans-serif; transition:all .2s; white-space:nowrap; }
+  .btn-draft:hover { border-color:var(--gold); color:var(--ink); }
+
+  .btn-submit.loading { pointer-events:none; }
+  .btn-submit.loading .btn-text { display:none; }
+  .btn-spinner { display:none; width:20px; height:20px; border:2px solid rgba(232,184,75,.3); border-top-color:var(--gold-light); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto; }
+  .btn-submit.loading .btn-spinner { display:block; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  /* SUCCESS */
+  .success-overlay { position:fixed; inset:0; background:rgba(26,18,9,.7); backdrop-filter:blur(6px); z-index:500; display:none; align-items:center; justify-content:center; }
+  .success-overlay.open { display:flex; }
+  .success-card { background:var(--card-bg); border-radius:28px; padding:48px 40px; text-align:center; max-width:440px; width:100%; border:1px solid var(--border); box-shadow:0 24px 64px rgba(0,0,0,.25); animation:popIn .4s cubic-bezier(.175,.885,.32,1.275) both; }
+  @keyframes popIn { from{opacity:0;transform:scale(.8)} to{opacity:1;transform:scale(1)} }
+  .sc-icon { width:80px; height:80px; background:linear-gradient(135deg,var(--sage),#3d8c52); border-radius:50%; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; font-size:36px; box-shadow:0 12px 32px rgba(74,124,89,.3); }
+  .sc-title { font-family:'Amiri',serif; font-size:28px; color:var(--ink); margin-bottom:8px; }
+  .sc-sub { font-size:13px; color:var(--muted); line-height:1.7; margin-bottom:28px; }
+  .sc-timeline { background:var(--warm); border-radius:14px; padding:16px; margin-bottom:28px; text-align:right; }
+  .sc-step { display:flex; align-items:center; gap:10px; padding:8px 0; font-size:12px; color:var(--muted); border-bottom:1px solid var(--border); }
+  .sc-step:last-child { border-bottom:none; }
+  .sc-step-icon { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+  .ss-done { background:rgba(74,124,89,.15); }
+  .ss-pending { background:rgba(201,151,58,.15); }
+  .btn-home { width:100%; padding:13px; background:var(--ink); color:var(--gold-light); border:none; border-radius:12px; cursor:pointer; font-size:14px; font-weight:700; font-family:'IBM Plex Sans Arabic',sans-serif; transition:all .2s; }
+  .btn-home:hover { background:var(--gold); color:var(--ink); }
+
+  /* RIGHT SIDEBAR */
+  .right-sidebar { width:280px; flex-shrink:0; display:flex; flex-direction:column; gap:16px; padding-right:32px; }
+  .widget { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:18px; }
+  .widget-title { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:14px; }
+
+  /* TIPS */
+  .tip-item { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+  .tip-item:last-child { border-bottom:none; }
+  .tip-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+  .tip-text { font-size:12px; color:var(--ink); line-height:1.6; }
+  .tip-label { font-size:10px; color:var(--gold); font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:3px; }
+
+  /* MY SUBMISSIONS */
+  .submission-item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .submission-item:last-child { border-bottom:none; }
+  .sub-icon { font-size:20px; flex-shrink:0; }
+  .sub-title { font-size:12px; font-weight:500; color:var(--ink); line-height:1.4; }
+  .sub-status { font-size:10px; margin-top:2px; }
+  .status-r { color:#d97706; } .status-a { color:var(--sage); } .status-x { color:var(--rust); }
+  .sub-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-right:auto; }
+  .dot-r { background:#d97706; } .dot-a { background:var(--sage); } .dot-x { background:var(--rust); }
+
+  @media(max-width:1100px){.right-sidebar{display:none;}}
+  @media(max-width:768px){.sidebar{display:none;}.page-body{padding:20px;}.two-col{grid-template-columns:1fr;}.type-selector{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">و</div>
+      <div><div class="logo-text">ورق</div><div class="logo-sub">Waraq · Microlearning</div></div>
+    </div>
+    <a class="nav-item" href="/app"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>الرئيسية</a>
+    <a class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>اكتشف</a>
+    <a class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>مكتبتي</a>
+    <a class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23,7 16,12 23,17"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>البودكاست</a>
+    <div class="nav-section-label">مجتمع</div>
+    <a class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>أصدقائي</a>
+    <a class="nav-item" href="/profile"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>ملفي الشخصي</a>
+    <div class="nav-section-label">نشر</div>
+    <a class="nav-item active"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>إضافة محتوى</a>
+    <div class="sidebar-bottom">
+      <div class="user-row"><div class="u-avatar">م</div><div><div class="u-name">محمد العمري</div><div class="u-streak">🔥 ١٤ يوماً متتالياً</div></div></div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="ph-inner">
+        <div class="ph-title">شارك ما يستحق 📤</div>
+        <div class="ph-sub">ساهم في إثراء مجتمع ورق بمحتوى قيّم. كل مشاركة تُراجع من فريق التحرير قبل النشر.</div>
+        <div class="guidelines">
+          <div class="guide-pill">⏱ مراجعة خلال <span>٢٤–٤٨ ساعة</span></div>
+          <div class="guide-pill">✅ محتوى <span>أصيل وغير مكرر</span></div>
+          <div class="guide-pill">📏 مقتطف <span>٥٠–٤٠٠ كلمة</span></div>
+          <div class="guide-pill">🏷 أضف <span>تصنيفاً دقيقاً</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="page-body">
+      <div class="form-area">
+
+        <!-- TYPE SELECTOR -->
+        <div class="section-label" style="margin-bottom:14px;animation:fadeUp .4s ease both;">نوع المحتوى</div>
+        <div class="type-selector">
+          <div class="type-card tc-book selected" onclick="selectType('book',this)">
+            <div class="tc-check">✓</div>
+            <span class="tc-icon">📚</span>
+            <div class="tc-name">مقتطف كتاب</div>
+            <div class="tc-desc">فقرة أو مقطع من كتاب ورأيك فيه</div>
+          </div>
+          <div class="type-card tc-podcast" onclick="selectType('podcast',this)">
+            <div class="tc-check">✓</div>
+            <span class="tc-icon">🎙</span>
+            <div class="tc-name">بودكاست</div>
+            <div class="tc-desc">ملخص حلقة أو مقطع صوتي مفيد</div>
+          </div>
+          <div class="type-card tc-quote" onclick="selectType('quote',this)">
+            <div class="tc-check">✓</div>
+            <span class="tc-icon">💡</span>
+            <div class="tc-name">حكمة أو فكرة</div>
+            <div class="tc-desc">اقتباس أو فكرة قصيرة ذات قيمة</div>
+          </div>
+        </div>
+
+        <!-- BOOK FORM -->
+        <div id="formBook" class="form-card" style="animation-delay:.08s">
+          <div class="section-label">معلومات الكتاب</div>
+          <div class="two-col">
+            <div class="field">
+              <label>عنوان الكتاب *</label>
+              <input type="text" placeholder="مثال: فن الأمور الصغيرة">
+            </div>
+            <div class="field">
+              <label>اسم المؤلف *</label>
+              <input type="text" placeholder="مثال: مارك مانسون">
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label>دار النشر</label>
+              <input type="text" placeholder="مثال: دار الكتب">
+            </div>
+            <div class="field">
+              <label>الفصل / الصفحة</label>
+              <input type="text" placeholder="مثال: الفصل الثالث، ص. ٧٨">
+            </div>
+          </div>
+        </div>
+
+        <div id="formPodcast" class="form-card" style="display:none;animation-delay:.08s">
+          <div class="section-label">معلومات البودكاست</div>
+          <div class="two-col">
+            <div class="field">
+              <label>اسم البودكاست *</label>
+              <input type="text" placeholder="مثال: عقول ومعرفة">
+            </div>
+            <div class="field">
+              <label>رقم الحلقة والعنوان *</label>
+              <input type="text" placeholder="مثال: ح٤٢ — كيف تعمل الذاكرة؟">
+            </div>
+          </div>
+          <div class="field">
+            <label>رابط الحلقة</label>
+            <input type="url" placeholder="https://..." dir="ltr">
+          </div>
+          <div class="field">
+            <label>رفع مقطع صوتي (اختياري)</label>
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('audioFile').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+              <div class="uz-icon">🎵</div>
+              <div class="uz-title">اسحب الملف هنا أو اضغط للتصفح</div>
+              <div class="uz-sub">ملف صوتي من الحلقة — اختياري</div>
+              <div class="uz-formats"><span class="uz-fmt">MP3</span><span class="uz-fmt">M4A</span><span class="uz-fmt">WAV</span><span class="uz-fmt">حتى ٥٠MB</span></div>
+            </div>
+            <input type="file" id="audioFile" accept="audio/*" style="display:none" onchange="fileSelected(this)">
+            <div class="file-selected" id="fileSelected">
+              <div class="fs-icon">🎵</div>
+              <div><div class="fs-name" id="fileName">—</div><div class="fs-size" id="fileSize">—</div></div>
+              <button class="fs-remove" onclick="removeFile()">×</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="formQuote" class="form-card" style="display:none;animation-delay:.08s">
+          <div class="section-label">مصدر الحكمة</div>
+          <div class="two-col">
+            <div class="field">
+              <label>قائل الحكمة *</label>
+              <input type="text" placeholder="مثال: ابن القيم الجوزية">
+            </div>
+            <div class="field">
+              <label>المرجع (إن وُجد)</label>
+              <input type="text" placeholder="مثال: مفتاح دار السعادة">
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="form-card" style="animation-delay:.12s">
+          <div class="section-label">المحتوى الرئيسي</div>
+
+          <div class="field">
+            <label>المقتطف / النص *</label>
+            <textarea id="excerptText" placeholder="الصق هنا المقتطف الذي تريد مشاركته..." rows="6" oninput="updatePreview(this.value);updateCount(this,'excerptCount',400)"></textarea>
+            <div class="field-footer">
+              <div class="field-hint">بين ٥٠ و٤٠٠ كلمة للمقتطفات — أقصر للحكم</div>
+              <div class="char-counter" id="excerptCount">٠ / ٤٠٠ كلمة</div>
+            </div>
+          </div>
+
+          <div class="excerpt-preview" id="excerptPreview">
+            <div class="ep-label">معاينة العرض</div>
+            <div class="ep-text" id="previewText"></div>
+          </div>
+        </div>
+
+        <!-- TAKEAWAY & COMMENT -->
+        <div class="form-card" style="animation-delay:.16s">
+          <div class="section-label">إضافتك الشخصية</div>
+          <div class="field">
+            <label>الفكرة الأساسية — Takeaway *</label>
+            <textarea placeholder="ما هو الدرس أو الفكرة الجوهرية في هذا المقتطف؟ (سيظهر كبطاقة مميزة)" rows="3" oninput="updateCount(this,'tkCount',150)"></textarea>
+            <div class="field-footer"><div></div><div class="char-counter" id="tkCount">٠ / ١٥٠ كلمة</div></div>
+          </div>
+          <div class="field">
+            <label>تعليقك الشخصي (اختياري)</label>
+            <textarea placeholder="ما الذي أثّر فيك شخصياً؟ كيف طبّقته أو ستطبقه؟" rows="3" oninput="updateCount(this,'cmtCount',200)"></textarea>
+            <div class="field-footer"><div></div><div class="char-counter" id="cmtCount">٠ / ٢٠٠ كلمة</div></div>
+          </div>
+        </div>
+
+        <!-- CLASSIFICATION -->
+        <div class="form-card" style="animation-delay:.2s">
+          <div class="section-label">التصنيف</div>
+          <div class="two-col">
+            <div class="field">
+              <label>المجال الرئيسي *</label>
+              <select>
+                <option value="" disabled selected>اختر المجال</option>
+                <option>علم النفس</option>
+                <option>فلسفة</option>
+                <option>علوم وتقنية</option>
+                <option>تاريخ وحضارة</option>
+                <option>أدب وشعر</option>
+                <option>تطوير ذات</option>
+                <option>ريادة أعمال</option>
+                <option>دين وروحانيات</option>
+                <option>صحة وطب</option>
+                <option>اقتصاد ومال</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>مستوى الصعوبة</label>
+              <select>
+                <option>للجميع</option>
+                <option>مبتدئ</option>
+                <option>متوسط</option>
+                <option>متقدم</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>الوسوم (Tags)</label>
+            <div class="tags-wrap" id="tagsWrap" onclick="document.getElementById('tagInput').focus()">
+              <div class="tag-item">علم نفس<button class="tag-remove" onclick="removeTag(this)">×</button></div>
+              <div class="tag-item">تطوير ذات<button class="tag-remove" onclick="removeTag(this)">×</button></div>
+              <input type="text" id="tagInput" class="tag-input" placeholder="أضف وسماً..." onkeydown="addTag(event)">
+            </div>
+            <div class="field-hint">اضغط Enter أو فاصلة لإضافة وسم</div>
+          </div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="guidelines-box">
+          <div class="gb-title">📋 تذكّر قبل الإرسال</div>
+          <div class="gb-list">
+            <div class="gb-item"><div class="gb-dot"></div>تأكد من صحة نسب المقتطف إلى مصدره الأصلي</div>
+            <div class="gb-item"><div class="gb-dot"></div>لا تنشر محتوى مكرراً موجوداً بالفعل في المنصة</div>
+            <div class="gb-item"><div class="gb-dot"></div>الفكرة الأساسية (Takeaway) يجب أن تكون بكلامك أنت</div>
+            <div class="gb-item"><div class="gb-dot"></div>سيتم إشعارك بنتيجة المراجعة خلال ٢٤–٤٨ ساعة</div>
+          </div>
+        </div>
+
+        <div class="submit-area">
+          <button class="btn-draft" onclick="saveDraft()">💾 حفظ كمسودة</button>
+          <button class="btn-submit" onclick="submitContent()">
+            <span class="btn-text">إرسال للمراجعة ✈️</span>
+            <div class="btn-spinner"></div>
+          </button>
+        </div>
+
+        <div style="height:32px;"></div>
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <aside class="right-sidebar">
+
+        <div class="widget">
+          <div class="widget-title">💡 نصائح المحررين</div>
+          <div class="tip-item"><div class="tip-icon">✍️</div><div><div class="tip-label">الفكرة الأساسية</div><div class="tip-text">اجعلها جملة واحدة قوية تلخّص جوهر المقتطف بأسلوبك</div></div></div>
+          <div class="tip-item"><div class="tip-icon">🎯</div><div><div class="tip-label">الوضوح</div><div class="tip-text">تجنّب المقتطفات التي تحتاج سياقاً طويلاً لفهمها</div></div></div>
+          <div class="tip-item"><div class="tip-icon">🌟</div><div><div class="tip-label">القيمة</div><div class="tip-text">اسأل نفسك: هل هذا المقتطف سيغيّر طريقة تفكير أحد؟</div></div></div>
+          <div class="tip-item"><div class="tip-icon">🏷</div><div><div class="tip-label">التصنيف</div><div class="tip-text">الوسوم الدقيقة تساعد في إيصال المحتوى للجمهور المناسب</div></div></div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-title">📊 مشاركاتي السابقة</div>
+          <div class="submission-item"><div class="sub-icon">📚</div><div><div class="sub-title">مقتطف من "العادات الذرية"</div><div class="sub-status status-r">⏳ قيد المراجعة</div></div><div class="sub-dot dot-r"></div></div>
+          <div class="submission-item"><div class="sub-icon">💡</div><div><div class="sub-title">حكمة ابن القيم عن الصبر</div><div class="sub-status status-a">✅ نُشر</div></div><div class="sub-dot dot-a"></div></div>
+          <div class="submission-item"><div class="sub-icon">🎙</div><div><div class="sub-title">بودكاست رواد — القيادة</div><div class="sub-status status-x">❌ مرفوض</div></div><div class="sub-dot dot-x"></div></div>
+          <div style="margin-top:12px;font-size:12px;color:var(--muted);text-align:center;">نسبة القبول: <strong style="color:var(--sage)">٦٧٪</strong></div>
+        </div>
+
+        <div class="widget" style="background:linear-gradient(135deg,rgba(201,151,58,.08),rgba(201,151,58,.03));border-color:rgba(201,151,58,.2);">
+          <div class="widget-title" style="color:var(--gold);">🏆 ناشر معتمد</div>
+          <div style="font-size:12px;color:var(--ink);line-height:1.7;margin-bottom:10px;">بعد قبول <strong>١٠ مشاركات</strong> ستحصل على شارة "ناشر معتمد" وأولوية في المراجعة</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="flex:1;height:6px;border-radius:3px;background:var(--border);overflow:hidden;"><div style="width:50%;height:100%;background:var(--gold);border-radius:3px;"></div></div>
+            <div style="font-size:11px;color:var(--gold);font-weight:700;">٥/١٠</div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-card">
+    <div class="sc-icon">✓</div>
+    <div class="sc-title">تم الإرسال بنجاح! 🎉</div>
+    <div class="sc-sub">شاركت معرفتك مع مجتمع ورق. فريق التحرير سيراجع مشاركتك قريباً.</div>
+    <div class="sc-timeline">
+      <div class="sc-step"><div class="sc-step-icon ss-done">✓</div><div>تم استلام مشاركتك بنجاح</div></div>
+      <div class="sc-step"><div class="sc-step-icon ss-pending">⏳</div><div>مراجعة فريق التحرير (٢٤–٤٨ ساعة)</div></div>
+      <div class="sc-step"><div class="sc-step-icon ss-pending">🔔</div><div>إشعار بالنتيجة عبر التطبيق</div></div>
+    </div>
+    <button class="btn-home" onclick="window.location='/app'">العودة للرئيسية ←</button>
+  </div>
+</div>
+
+<script>
+  let currentType = 'book';
+
+  function selectType(type, el) {
+    currentType = type;
+    document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('formBook').style.display = type==='book' ? 'block' : 'none';
+    document.getElementById('formPodcast').style.display = type==='podcast' ? 'block' : 'none';
+    document.getElementById('formQuote').style.display = type==='quote' ? 'block' : 'none';
+  }
+
+  function updatePreview(text) {
+    const preview = document.getElementById('excerptPreview');
+    const previewText = document.getElementById('previewText');
+    if(text.trim().length > 20) {
+      preview.classList.add('show');
+      previewText.textContent = text.trim();
+    } else {
+      preview.classList.remove('show');
+    }
+  }
+
+  function updateCount(el, countId, max) {
+    const words = el.value.trim().split(/\s+/).filter(w=>w).length;
+    const counter = document.getElementById(countId);
+    counter.textContent = words + ' / ' + max + ' كلمة';
+    counter.classList.toggle('warn', words > max);
+  }
+
+  function addTag(e) {
+    if(e.key==='Enter'||e.key===',') {
+      e.preventDefault();
+      const val = e.target.value.trim().replace(',','');
+      if(!val) return;
+      const wrap = document.getElementById('tagsWrap');
+      const tag = document.createElement('div');
+      tag.className = 'tag-item';
+      tag.innerHTML = val + '<button class="tag-remove" onclick="removeTag(this)">×</button>';
+      wrap.insertBefore(tag, e.target);
+      e.target.value = '';
+    }
+  }
+
+  function removeTag(btn) { btn.parentElement.remove(); }
+
+  function dragOver(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('dragover'); }
+  function dragLeave(e) { document.getElementById('uploadZone').classList.remove('dragover'); }
+  function dropFile(e) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if(file) showFile(file);
+  }
+
+  function fileSelected(input) { if(input.files[0]) showFile(input.files[0]); }
+
+  function showFile(file) {
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = (file.size/1024/1024).toFixed(2) + ' MB';
+    document.getElementById('fileSelected').classList.add('show');
+    document.getElementById('uploadZone').style.display = 'none';
+  }
+
+  function removeFile() {
+    document.getElementById('fileSelected').classList.remove('show');
+    document.getElementById('uploadZone').style.display = 'block';
+    document.getElementById('audioFile').value = '';
+  }
+
+  function saveDraft() {
+    const btn = event.currentTarget;
+    btn.textContent = '✓ تم حفظ المسودة';
+    btn.style.color = 'var(--sage)';
+    btn.style.borderColor = 'var(--sage)';
+    setTimeout(()=>{ btn.textContent='💾 حفظ كمسودة'; btn.style.color=''; btn.style.borderColor=''; },2000);
+  }
+
+  function submitContent() {
+    const btn = event.currentTarget;
+    btn.classList.add('loading');
+    setTimeout(()=>{
+      btn.classList.remove('loading');
+      document.getElementById('successOverlay').classList.add('open');
+    }, 1800);
+  }
+
+  document.getElementById('successOverlay').addEventListener('click', function(e){
+    if(e.target===this) this.classList.remove('open');
+  });
+</script>
+</body>
+</html>

@@ -1,5 +1,11 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/waraq-login.html" }
+    { "source": "/", "destination": "/waraq-login.html" },
+    { "source": "/app", "destination": "/waraq-app.html" },
+    { "source": "/profile", "destination": "/waraq-profile.html" },
+    { "source": "/friends", "destination": "/waraq-friends.html" },
+    { "source": "/submit", "destination": "/waraq-submit.html" },
+    { "source": "/editor", "destination": "/waraq-editor.html" },
+    { "source": "/interests", "destination": "/waraq-interests.html" }
   ]
 }

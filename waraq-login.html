@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورق — تسجيل الدخول</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1209;
+    --cream: #f5f0e8;
+    --warm: #f0e6d0;
+    --gold: #c9973a;
+    --gold-light: #e8b84b;
+    --rust: #b84c2a;
+    --sage: #4a7c59;
+    --muted: #8c7b68;
+    --border: rgba(139,110,60,0.18);
+    --card-bg: #fffdf7;
+    --err: #c0392b;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background: var(--ink);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ====== NOISE ====== */
+  body::after {
+    content:'';
+    position:fixed; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:999;
+  }
+
+  /* ====== LEFT PANEL — BRAND ====== */
+  .brand-panel {
+    width: 52%;
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px 56px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Geometric Islamic-inspired background */
+  .brand-panel::before {
+    content:'';
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 80%, rgba(201,151,58,.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 10%, rgba(184,76,42,.08) 0%, transparent 55%);
+    pointer-events:none;
+  }
+
+  .geo-pattern {
+    position:absolute; inset:0;
+    pointer-events:none;
+    opacity:0.06;
+  }
+
+  .brand-logo {
+    display:flex; align-items:center; gap:14px;
+    position:relative; z-index:2;
+    animation: fadeDown .6s ease both;
+  }
+
+  .logo-mark {
+    width:52px; height:52px;
+    background:var(--gold);
+    border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Amiri',serif; font-size:26px; color:var(--ink); font-weight:700;
+    box-shadow: 0 8px 24px rgba(201,151,58,.35);
+  }
+
+  .brand-name { font-family:'Amiri',serif; font-size:30px; color:var(--cream); }
+  .brand-tagline { font-size:11px; color:rgba(240,230,208,.4); letter-spacing:2.5px; text-transform:uppercase; margin-top:2px; }
+
+  /* CENTER CONTENT */
+  .brand-center {
+    flex:1; display:flex; flex-direction:column;
+    justify-content:center;
+    position:relative; z-index:2;
+    padding: 40px 0;
+  }
+
+  .brand-headline {
+    font-family:'Amiri',serif;
+    font-size:54px;
+    color:var(--cream);
+    line-height:1.25;
+    margin-bottom:24px;
+    animation: fadeUp .7s ease both .15s;
+  }
+
+  .brand-headline span {
+    color:var(--gold);
+    position:relative;
+    display:inline-block;
+  }
+
+  .brand-headline span::after {
+    content:'';
+    position:absolute; bottom:-4px; left:0; right:0;
+    height:2px;
+    background:linear-gradient(90deg, var(--gold), transparent);
+    border-radius:1px;
+    animation: lineIn .6s ease both .7s;
+    transform-origin:right;
+  }
+
+  @keyframes lineIn { from{scaleX:0} to{scaleX:1} }
+
+  .brand-desc {
+    font-size:15px; color:rgba(240,230,208,.55);
+    line-height:1.8; max-width:420px;
+    animation: fadeUp .7s ease both .25s;
+  }
+
+  /* FEATURE PILLS */
+  .feature-pills {
+    display:flex; flex-direction:column; gap:12px;
+    margin-top:40px;
+    animation: fadeUp .7s ease both .35s;
+  }
+
+  .pill {
+    display:flex; align-items:center; gap:14px;
+    padding:14px 18px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:14px;
+    transition:all .25s;
+    cursor:default;
+  }
+
+  .pill:hover {
+    background:rgba(201,151,58,.08);
+    border-color:rgba(201,151,58,.2);
+    transform:translateX(-4px);
+  }
+
+  .pill-icon {
+    width:38px; height:38px;
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; flex-shrink:0;
+  }
+
+  .pi-gold { background:rgba(201,151,58,.15); }
+  .pi-sage { background:rgba(74,124,89,.15); }
+  .pi-rust { background:rgba(184,76,42,.15); }
+
+  .pill-text { flex:1; }
+  .pill-title { font-size:13px; font-weight:600; color:rgba(240,230,208,.85); }
+  .pill-sub { font-size:11px; color:rgba(240,230,208,.4); margin-top:2px; }
+
+  /* BOTTOM QUOTE */
+  .brand-quote {
+    position:relative; z-index:2;
+    border-right:2px solid rgba(201,151,58,.4);
+    padding-right:16px;
+    animation: fadeUp .7s ease both .5s;
+  }
+
+  .quote-ar { font-family:'Amiri',serif; font-size:16px; color:rgba(240,230,208,.6); line-height:1.7; }
+  .quote-src { font-size:11px; color:rgba(201,151,58,.6); margin-top:6px; }
+
+  /* ====== RIGHT PANEL — FORM ====== */
+  .form-panel {
+    flex:1;
+    background:var(--cream);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:48px 40px;
+    overflow-y:auto;
+    position:relative;
+  }
+
+  .form-panel::before {
+    content:'';
+    position:absolute; top:0; right:0;
+    width:1px; height:100%;
+    background:linear-gradient(180deg, transparent, rgba(201,151,58,.3) 30%, rgba(201,151,58,.3) 70%, transparent);
+  }
+
+  .form-box {
+    width:100%; max-width:420px;
+  }
+
+  .form-header { margin-bottom:32px; animation: fadeDown .5s ease both; }
+  .form-title { font-family:'Amiri',serif; font-size:32px; color:var(--ink); }
+  .form-sub { font-size:13px; color:var(--muted); margin-top:6px; line-height:1.6; }
+
+  /* TABS */
+  .auth-tabs {
+    display:flex;
+    background:var(--warm);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:4px;
+    margin-bottom:28px;
+    animation: fadeDown .5s ease both .06s;
+  }
+
+  .auth-tab {
+    flex:1; padding:10px;
+    border-radius:9px; border:none;
+    background:transparent; cursor:pointer;
+    font-size:14px; font-weight:500; color:var(--muted);
+    font-family:'IBM Plex Sans Arabic',sans-serif;
+    transition:all .2s;
+  }
+
+  .auth-tab.active {
+    background:var(--ink);
+    color:var(--gold-light);
+    font-weight:600;
+    box-shadow:0 2px 8px rgba(26,18,9,.2);
+  }
+
+  /* FORM FIELDS */
+  .field-group {
+    display:flex; flex-direction:column; gap:16px;
+    animation: fadeUp .5s ease both .12s;
+  }
+
+  .field {
+    display:flex; flex-direction:column; gap:6px;
+  }
+
+  .field label {
+    font-size:12px; font-weight:600; color:var(--ink);
+    letter-spacing:.3px;
+  }
+
+  .field-wrap {
+    position:relative;
+  }
+
+  .field-icon {
+    position:absolute; right:14px; top:50%;
+    transform:translateY(-50%);
+    color:var(--muted);
+    pointer-events:none;
+    transition:color .2s;
+  }
+
+  .field-icon svg { width:16px; height:16px; }
+
+  .field input {
+    width:100%;
+    padding:12px 42px 12px 16px;
+    border:1.5px solid var(--border);
+    border-radius:12px;
+    background:var(--card-bg);
+    color:var(--ink);
+    font-size:14px;
+    font-family:'IBM Plex Sans Arabic',sans-serif;
+    transition:all .2s;
+    direction:rtl;
+    outline:none;
+  }
+
+  .field input:focus {
+    border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(201,151,58,.1);
+  }
+
+  .field input:focus + .field-icon,
+  .field-wrap:focus-within .field-icon { color:var(--gold); }
+
+  .field input.error { border-color:var(--err); }
+  .field input::placeholder { color:rgba(140,123,104,.5); }
+
+  .field-error { font-size:11px; color:var(--err); margin-top:3px; display:none; }
+  .field-error.show { display:block; }
+
+  /* PASSWORD TOGGLE */
+  .pw-toggle {
+    position:absolute; left:12px; top:50%;
+    transform:translateY(-50%);
+    background:none; border:none; cursor:pointer;
+    color:var(--muted); padding:4px;
+    transition:color .2s;
+  }
+  .pw-toggle:hover { color:var(--ink); }
+  .pw-toggle svg { width:15px; height:15px; display:block; }
+
+  /* PASSWORD STRENGTH */
+  .pw-strength { margin-top:6px; }
+  .strength-bars { display:flex; gap:4px; margin-bottom:4px; }
+  .s-bar { flex:1; height:3px; border-radius:2px; background:var(--border); transition:background .3s; }
+  .s-bar.weak { background:#e74c3c; }
+  .s-bar.fair { background:#f39c12; }
+  .s-bar.good { background:var(--sage); }
+  .s-bar.strong { background:var(--sage); }
+  .strength-label { font-size:10px; color:var(--muted); }
+
+  /* INTERESTS SELECTOR (signup only) */
+  .interests-grid {
+    display:flex; flex-wrap:wrap; gap:8px;
+  }
+
+  .int-chip {
+    padding:7px 14px; border-radius:100px;
+    font-size:12px; font-weight:500;
+    border:1.5px solid var(--border);
+    background:var(--card-bg);
+    color:var(--muted); cursor:pointer;
+    transition:all .2s;
+    user-select:none;
+  }
+
+  .int-chip:hover { border-color:var(--gold); color:var(--ink); }
+
+  .int-chip.selected {
+    background:var(--ink); color:var(--gold-light);
+    border-color:var(--ink);
+  }
+
+  /* DIVIDER */
+  .divider {
+    display:flex; align-items:center; gap:12px;
+    margin:20px 0;
+    color:var(--muted); font-size:12px;
+  }
+  .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* SOCIAL BTNS */
+  .social-btns { display:flex; gap:10px; margin-bottom:4px; }
+
+  .social-btn {
+    flex:1; padding:11px;
+    border:1.5px solid var(--border);
+    border-radius:12px; background:var(--card-bg);
+    cursor:pointer; display:flex; align-items:center;
+    justify-content:center; gap:8px;
+    font-size:13px; font-weight:500; color:var(--ink);
+    font-family:'IBM Plex Sans Arabic',sans-serif;
+    transition:all .2s;
+  }
+  .social-btn:hover { border-color:var(--gold); background:var(--warm); }
+  .social-btn img { width:18px; height:18px; }
+
+  /* SUBMIT */
+  .submit-btn {
+    width:100%; padding:14px;
+    background:var(--ink); color:var(--gold-light);
+    border:none; border-radius:12px; cursor:pointer;
+    font-size:15px; font-weight:700;
+    font-family:'IBM Plex Sans Arabic',sans-serif;
+    transition:all .25s;
+    position:relative; overflow:hidden;
+    margin-top:4px;
+  }
+
+  .submit-btn::before {
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(135deg, transparent 0%, rgba(201,151,58,.15) 50%, transparent 100%);
+    transform:translateX(100%);
+    transition:transform .4s ease;
+  }
+
+  .submit-btn:hover { background:#2d1f0e; transform:translateY(-1px); box-shadow:0 8px 24px rgba(26,18,9,.2); }
+  .submit-btn:hover::before { transform:translateX(-100%); }
+  .submit-btn:active { transform:translateY(0); }
+
+  .submit-btn.loading {
+    pointer-events:none; opacity:.8;
+  }
+
+  .btn-spinner {
+    display:none;
+    width:18px; height:18px;
+    border:2px solid rgba(232,184,75,.3);
+    border-top-color:var(--gold-light);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+    margin:0 auto;
+  }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  .submit-btn.loading .btn-text { display:none; }
+  .submit-btn.loading .btn-spinner { display:block; }
+
+  /* TERMS */
+  .terms-check {
+    display:flex; align-items:flex-start; gap:10px;
+    font-size:12px; color:var(--muted); line-height:1.6;
+  }
+
+  .terms-check input[type="checkbox"] {
+    width:16px; height:16px; margin-top:1px;
+    accent-color:var(--gold);
+    flex-shrink:0; cursor:pointer;
+  }
+
+  .terms-check a { color:var(--gold); text-decoration:none; font-weight:500; }
+  .terms-check a:hover { text-decoration:underline; }
+
+  /* FORGOT */
+  .forgot-link {
+    font-size:12px; color:var(--gold);
+    text-decoration:none; font-weight:500;
+    margin-top:2px; display:inline-block;
+    transition:opacity .15s;
+  }
+  .forgot-link:hover { opacity:.7; }
+
+  /* SUCCESS STATE */
+  .success-screen {
+    display:none;
+    text-align:center;
+    animation:fadeUp .5s ease both;
+  }
+
+  .success-icon {
+    width:80px; height:80px;
+    background:linear-gradient(135deg,var(--sage),#3d8c52);
+    border-radius:50%; margin:0 auto 24px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:36px;
+    box-shadow:0 12px 32px rgba(74,124,89,.3);
+  }
+
+  .success-title { font-family:'Amiri',serif; font-size:28px; color:var(--ink); margin-bottom:8px; }
+  .success-sub { font-size:13px; color:var(--muted); line-height:1.7; margin-bottom:28px; }
+
+  /* STEP INDICATOR */
+  .steps {
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:24px;
+    animation: fadeDown .5s ease both .06s;
+  }
+
+  .step {
+    display:flex; align-items:center; gap:8px;
+  }
+
+  .step-dot {
+    width:28px; height:28px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700;
+    border:2px solid var(--border);
+    color:var(--muted); background:var(--card-bg);
+    transition:all .3s;
+  }
+
+  .step-dot.active { background:var(--ink); color:var(--gold-light); border-color:var(--ink); }
+  .step-dot.done { background:var(--sage); color:white; border-color:var(--sage); }
+
+  .step-label { font-size:11px; color:var(--muted); }
+  .step-label.active { color:var(--ink); font-weight:600; }
+
+  .step-line { flex:1; height:1px; background:var(--border); min-width:20px; }
+  .step-line.done { background:var(--sage); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* FORM SLIDES */
+  .form-screen { animation:fadeUp .35s ease both; }
+
+  /* RESPONSIVE */
+  @media(max-width:900px){
+    .brand-panel { display:none; }
+    .form-panel { padding:40px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BRAND PANEL -->
+<div class="brand-panel">
+  <svg class="geo-pattern" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice">
+    <!-- Islamic geometric star pattern -->
+    <defs>
+      <pattern id="star" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+        <polygon points="40,5 47,27 70,27 52,41 59,63 40,50 21,63 28,41 10,27 33,27" fill="none" stroke="white" stroke-width="0.8"/>
+        <rect x="20" y="20" width="40" height="40" fill="none" stroke="white" stroke-width="0.5" transform="rotate(45,40,40)"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#star)"/>
+  </svg>
+
+  <div class="brand-logo">
+    <div class="logo-mark">و</div>
+    <div>
+      <div class="brand-name">ورق</div>
+      <div class="brand-tagline">Waraq · Microlearning</div>
+    </div>
+  </div>
+
+  <div class="brand-center">
+    <div class="brand-headline">
+      تعلّم كل يوم<br>
+      <span>فكرة جديدة</span>
+    </div>
+    <div class="brand-desc">
+      منصة عربية للتعلم المتقطع — مقتطفات من أفضل الكتب، وبودكاست منتقى، وحكم تُلامس العقل.
+      كل هذا في دقائق يومية.
+    </div>
+
+    <div class="feature-pills">
+      <div class="pill">
+        <div class="pill-icon pi-gold">📚</div>
+        <div class="pill-text">
+          <div class="pill-title">محتوى منتقى بعناية</div>
+          <div class="pill-sub">فريق تحريري متخصص يختار ما يستحق</div>
+        </div>
+      </div>
+      <div class="pill">
+        <div class="pill-icon pi-sage">🔥</div>
+        <div class="pill-text">
+          <div class="pill-title">سلاسل التعلم اليومية</div>
+          <div class="pill-sub">ابنِ عادة التعلم بشكل ممتع</div>
+        </div>
+      </div>
+      <div class="pill">
+        <div class="pill-icon pi-rust">👥</div>
+        <div class="pill-text">
+          <div class="pill-title">شارك دائرتك</div>
+          <div class="pill-sub">تبادل الأفكار مع أصدقائك</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="brand-quote">
+    <div class="quote-ar">"طلب العلم فريضة على كل مسلم"</div>
+    <div class="quote-src">— الحديث النبوي الشريف</div>
+  </div>
+</div>
+
+<!-- FORM PANEL -->
+<div class="form-panel">
+  <div class="form-box">
+
+    <!-- HEADER -->
+    <div class="form-header">
+      <div class="form-title" id="formTitle">أهلاً بعودتك 👋</div>
+      <div class="form-sub" id="formSub">سجّل دخولك للمتابعة من حيث توقفت</div>
+    </div>
+
+    <!-- AUTH TABS -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="showLogin()">تسجيل الدخول</button>
+      <button class="auth-tab" id="tabSignup" onclick="showSignup()">إنشاء حساب</button>
+    </div>
+
+    <!-- ===== LOGIN FORM ===== -->
+    <div id="loginForm" class="form-screen">
+      <div class="social-btns">
+        <button class="social-btn" onclick="socialLogin('Google')">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Google
+        </button>
+        <button class="social-btn" onclick="socialLogin('Apple')">
+          <svg width="18" height="18" viewBox="0 0 814 1000"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-109.7C69.3 750 0 609.4 0 482.2 0 305.4 101.4 208 199.6 208c51.4 0 94.4 33.5 126.8 33.5 30.8 0 79.7-35.5 140.5-35.5 22.6 0 116.4 2 175.4 80.7zm-130.5-94.5c24.3-27.8 41.6-65.6 41.6-103.3 0-6.5-.5-13.1-1.6-18.4-39.5 1.5-87.1 26.5-114.7 55.5-22.1 24-42.8 62-42.8 100.4 0 7 1 14 1.5 16.3 2.5.5 6.5 1 10.5 1 35.5 0 79.5-24 105.5-51.5z"/></svg>
+          Apple
+        </button>
+      </div>
+
+      <div class="divider">أو بالبريد الإلكتروني</div>
+
+      <div class="field-group">
+        <div class="field">
+          <label>البريد الإلكتروني</label>
+          <div class="field-wrap">
+            <input type="email" id="loginEmail" placeholder="example@email.com" dir="ltr">
+            <div class="field-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            </div>
+          </div>
+          <div class="field-error" id="loginEmailErr">يرجى إدخال بريد إلكتروني صحيح</div>
+        </div>
+
+        <div class="field">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label>كلمة المرور</label>
+            <a href="#" class="forgot-link" onclick="showForgot(event)">نسيت كلمة المرور؟</a>
+          </div>
+          <div class="field-wrap">
+            <input type="password" id="loginPassword" placeholder="••••••••" dir="ltr">
+            <div class="field-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </div>
+            <button class="pw-toggle" onclick="togglePW('loginPassword', this)" type="button">
+              <svg id="eyeLogin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="field-error" id="loginPassErr">كلمة المرور يجب أن تكون ٨ أحرف على الأقل</div>
+        </div>
+
+        <button class="submit-btn" onclick="doLogin()">
+          <span class="btn-text">تسجيل الدخول</span>
+          <div class="btn-spinner"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== SIGNUP FORM ===== -->
+    <div id="signupForm" class="form-screen" style="display:none">
+
+      <!-- STEP INDICATOR -->
+      <div class="steps" id="stepsBar">
+        <div class="step">
+          <div class="step-dot active" id="dot1">١</div>
+          <div class="step-label active" id="lbl1">الحساب</div>
+        </div>
+        <div class="step-line" id="line1"></div>
+        <div class="step">
+          <div class="step-dot" id="dot2">٢</div>
+          <div class="step-label" id="lbl2">المعلومات</div>
+        </div>
+        <div class="step-line" id="line2"></div>
+        <div class="step">
+          <div class="step-dot" id="dot3">٣</div>
+          <div class="step-label" id="lbl3">الاهتمامات</div>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div id="step1" class="form-screen">
+        <div class="field-group">
+          <div class="field">
+            <label>البريد الإلكتروني</label>
+            <div class="field-wrap">
+              <input type="email" id="regEmail" placeholder="example@email.com" dir="ltr">
+              <div class="field-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg></div>
+            </div>
+            <div class="field-error" id="regEmailErr">يرجى إدخال بريد إلكتروني صحيح</div>
+          </div>
+
+          <div class="field">
+            <label>كلمة المرور</label>
+            <div class="field-wrap">
+              <input type="password" id="regPassword" placeholder="••••••••" dir="ltr" oninput="checkStrength(this.value)">
+              <div class="field-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+              <button class="pw-toggle" onclick="togglePW('regPassword',this)" type="button">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="pw-strength" id="pwStrength" style="display:none">
+              <div class="strength-bars">
+                <div class="s-bar" id="sb1"></div>
+                <div class="s-bar" id="sb2"></div>
+                <div class="s-bar" id="sb3"></div>
+                <div class="s-bar" id="sb4"></div>
+              </div>
+              <div class="strength-label" id="strengthLabel"></div>
+            </div>
+            <div class="field-error" id="regPassErr">كلمة المرور يجب أن تكون ٨ أحرف على الأقل</div>
+          </div>
+
+          <div class="field">
+            <label>تأكيد كلمة المرور</label>
+            <div class="field-wrap">
+              <input type="password" id="regConfirm" placeholder="••••••••" dir="ltr">
+              <div class="field-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></div>
+            </div>
+            <div class="field-error" id="regConfirmErr">كلمتا المرور غير متطابقتين</div>
+          </div>
+
+          <button class="submit-btn" onclick="goStep2()">التالي ←</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="step2" class="form-screen" style="display:none">
+        <div class="field-group">
+          <div class="field">
+            <label>الاسم الكامل</label>
+            <div class="field-wrap">
+              <input type="text" id="regName" placeholder="محمد العمري">
+              <div class="field-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            </div>
+            <div class="field-error" id="regNameErr">يرجى إدخال الاسم</div>
+          </div>
+
+          <div class="field">
+            <label>اسم المستخدم</label>
+            <div class="field-wrap">
+              <input type="text" id="regHandle" placeholder="@username" dir="ltr" oninput="checkHandle(this.value)">
+              <div class="field-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 006 0v-1a10 10 0 10-3.92 7.94"/></svg></div>
+            </div>
+            <div class="field-error" id="regHandleErr">اسم المستخدم مأخوذ. جرّب آخر</div>
+            <div style="font-size:11px;color:var(--sage);margin-top:4px;display:none" id="handleOk">✓ متاح</div>
+          </div>
+
+          <div class="field">
+            <label>نبذة قصيرة (اختياري)</label>
+            <div class="field-wrap">
+              <input type="text" id="regBio" placeholder="مهندس، قارئ نهم، أحب الفلسفة...">
+              <div class="field-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;">
+            <button class="submit-btn" style="background:var(--warm);color:var(--ink);flex:0 0 auto;width:56px;" onclick="goStep1()">→</button>
+            <button class="submit-btn" style="flex:1" onclick="goStep3()">التالي ←</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 — INTERESTS -->
+      <div id="step3" class="form-screen" style="display:none">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;">
+          اختر ما يثير اهتمامك لنُخصّص لك المحتوى (اختر ٣ على الأقل)
+        </div>
+        <div class="interests-grid" id="interestsGrid">
+          <div class="int-chip" onclick="toggleInt(this)">📖 أدب عربي</div>
+          <div class="int-chip" onclick="toggleInt(this)">🧬 علوم</div>
+          <div class="int-chip" onclick="toggleInt(this)">🧠 علم نفس</div>
+          <div class="int-chip" onclick="toggleInt(this)">🏛 تاريخ</div>
+          <div class="int-chip" onclick="toggleInt(this)">💡 فلسفة</div>
+          <div class="int-chip" onclick="toggleInt(this)">💼 ريادة أعمال</div>
+          <div class="int-chip" onclick="toggleInt(this)">🤖 تقنية</div>
+          <div class="int-chip" onclick="toggleInt(this)">🌍 جغرافيا</div>
+          <div class="int-chip" onclick="toggleInt(this)">🎙 بودكاست</div>
+          <div class="int-chip" onclick="toggleInt(this)">🔬 أبحاث</div>
+          <div class="int-chip" onclick="toggleInt(this)">🌱 بيئة</div>
+          <div class="int-chip" onclick="toggleInt(this)">🎨 فنون</div>
+        </div>
+        <div class="field-error" id="intErr" style="margin-top:10px;">يرجى اختيار ٣ اهتمامات على الأقل</div>
+
+        <div class="terms-check" style="margin:20px 0 16px;">
+          <input type="checkbox" id="termsCheck">
+          <label for="termsCheck">
+            أوافق على <a href="#">شروط الاستخدام</a> و<a href="#">سياسة الخصوصية</a> لمنصة ورق
+          </label>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <button class="submit-btn" style="background:var(--warm);color:var(--ink);flex:0 0 auto;width:56px;" onclick="goStep2back()">→</button>
+          <button class="submit-btn" style="flex:1" id="createBtn" onclick="doRegister()">
+            <span class="btn-text">إنشاء الحساب 🎉</span>
+            <div class="btn-spinner"></div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FORGOT PASSWORD ===== -->
+    <div id="forgotForm" class="form-screen" style="display:none">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:48px;margin-bottom:12px;">🔑</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;">
+          أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>البريد الإلكتروني</label>
+          <div class="field-wrap">
+            <input type="email" id="forgotEmail" placeholder="example@email.com" dir="ltr">
+            <div class="field-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg></div>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="doForgot()">إرسال رابط الاستعادة</button>
+        <button onclick="showLogin()" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);text-align:center;font-family:inherit;padding:4px;">← العودة لتسجيل الدخول</button>
+      </div>
+    </div>
+
+    <!-- ===== SUCCESS ===== -->
+    <div id="successScreen" class="success-screen">
+      <div class="success-icon">✓</div>
+      <div class="success-title">مرحباً بك في ورق! 🎉</div>
+      <div class="success-sub">
+        تم إنشاء حسابك بنجاح.<br>
+        ابدأ رحلتك مع أول دقائق التعلم اليومي.
+      </div>
+      <button class="submit-btn" onclick="window.location='waraq-app.html'" style="max-width:260px;margin:0 auto;display:block;">
+        ابدأ الاستكشاف ←
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentMode = 'login';
+
+  function showLogin() {
+    currentMode = 'login';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('forgotForm').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'none';
+    document.getElementById('tabLogin').classList.add('active');
+    document.getElementById('tabSignup').classList.remove('active');
+    document.getElementById('formTitle').textContent = 'أهلاً بعودتك 👋';
+    document.getElementById('formSub').textContent = 'سجّل دخولك للمتابعة من حيث توقفت';
+    document.getElementById('stepsBar') && null;
+  }
+
+  function showSignup() {
+    currentMode = 'signup';
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('signupForm').style.display = 'block';
+    document.getElementById('forgotForm').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'none';
+    document.getElementById('tabLogin').classList.remove('active');
+    document.getElementById('tabSignup').classList.add('active');
+    document.getElementById('formTitle').textContent = 'انضم إلى ورق ✨';
+    document.getElementById('formSub').textContent = 'أنشئ حسابك وابدأ رحلة التعلم اليومي';
+    showStep(1);
+  }
+
+  function showForgot(e) {
+    e.preventDefault();
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('forgotForm').style.display = 'block';
+    document.getElementById('formTitle').textContent = 'استعادة كلمة المرور';
+    document.getElementById('formSub').textContent = '';
+  }
+
+  function showStep(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById('step'+i).style.display = i===n ? 'block' : 'none';
+      const dot = document.getElementById('dot'+i);
+      const lbl = document.getElementById('lbl'+i);
+      dot.classList.toggle('active', i===n);
+      dot.classList.toggle('done', i<n);
+      lbl.classList.toggle('active', i===n);
+    });
+    if(n>1) { document.getElementById('line1').classList.add('done'); }
+    else { document.getElementById('line1').classList.remove('done'); }
+    if(n>2) { document.getElementById('line2').classList.add('done'); }
+    else { document.getElementById('line2').classList.remove('done'); }
+  }
+
+  function goStep2() {
+    const email = document.getElementById('regEmail').value;
+    const pass = document.getElementById('regPassword').value;
+    const conf = document.getElementById('regConfirm').value;
+    let ok = true;
+    if(!email.includes('@')) { showErr('regEmailErr'); ok=false; } else hideErr('regEmailErr');
+    if(pass.length < 8) { showErr('regPassErr'); ok=false; } else hideErr('regPassErr');
+    if(pass !== conf) { showErr('regConfirmErr'); ok=false; } else hideErr('regConfirmErr');
+    if(ok) showStep(2);
+  }
+
+  function goStep3() {
+    const name = document.getElementById('regName').value.trim();
+    if(!name) { showErr('regNameErr'); return; } else hideErr('regNameErr');
+    showStep(3);
+  }
+
+  function goStep1() { showStep(1); }
+  function goStep2back() { showStep(2); }
+
+  function toggleInt(el) {
+    el.classList.toggle('selected');
+    const count = document.querySelectorAll('.int-chip.selected').length;
+    if(count >= 3) hideErr('intErr');
+  }
+
+  function checkStrength(pw) {
+    const el = document.getElementById('pwStrength');
+    el.style.display = pw.length > 0 ? 'block' : 'none';
+    const bars = [1,2,3,4].map(i => document.getElementById('sb'+i));
+    const lbl = document.getElementById('strengthLabel');
+    bars.forEach(b => b.className = 's-bar');
+    let score = 0;
+    if(pw.length >= 8) score++;
+    if(/[A-Z]/.test(pw)) score++;
+    if(/[0-9]/.test(pw)) score++;
+    if(/[^A-Za-z0-9]/.test(pw)) score++;
+    const levels = ['','weak','fair','good','strong'];
+    const labels = ['','ضعيفة','مقبولة','جيدة','قوية 💪'];
+    const colors = ['','#e74c3c','#f39c12','var(--sage)','var(--sage)'];
+    for(let i=0;i<score;i++) bars[i].className = 's-bar ' + levels[score];
+    lbl.textContent = 'قوة كلمة المرور: ' + (labels[score]||'');
+    lbl.style.color = colors[score]||'var(--muted)';
+  }
+
+  let handleTimer;
+  function checkHandle(v) {
+    clearTimeout(handleTimer);
+    document.getElementById('handleOk').style.display = 'none';
+    hideErr('regHandleErr');
+    if(v.length < 3) return;
+    handleTimer = setTimeout(() => {
+      const taken = ['admin','waraq','test','user'];
+      if(taken.includes(v.toLowerCase())) { showErr('regHandleErr'); }
+      else { document.getElementById('handleOk').style.display = 'block'; }
+    }, 600);
+  }
+
+  function togglePW(id, btn) {
+    const inp = document.getElementById(id);
+    const isText = inp.type === 'text';
+    inp.type = isText ? 'password' : 'text';
+    btn.querySelector('svg').innerHTML = isText
+      ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+      : '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  }
+
+  function showErr(id) { document.getElementById(id).classList.add('show'); }
+  function hideErr(id) { document.getElementById(id).classList.remove('show'); }
+
+  function doLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPassword').value;
+    let ok = true;
+    if(!email.includes('@')) { showErr('loginEmailErr'); ok=false; } else hideErr('loginEmailErr');
+    if(pass.length < 8) { showErr('loginPassErr'); ok=false; } else hideErr('loginPassErr');
+    if(!ok) return;
+    const btn = event.currentTarget;
+    btn.classList.add('loading');
+    setTimeout(() => { window.location='waraq-app.html'; }, 1500);
+  }
+
+  function doRegister() {
+    const count = document.querySelectorAll('.int-chip.selected').length;
+    if(count < 3) { showErr('intErr'); return; }
+    if(!document.getElementById('termsCheck').checked) {
+      alert('يرجى الموافقة على شروط الاستخدام'); return;
+    }
+    document.getElementById('createBtn').classList.add('loading');
+    setTimeout(() => {
+      document.getElementById('signupForm').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+      document.getElementById('stepsBar').style.display = 'none';
+      document.getElementById('formTitle').textContent = '';
+      document.getElementById('formSub').textContent = '';
+    }, 1800);
+  }
+
+  function doForgot() {
+    const email = document.getElementById('forgotEmail').value;
+    if(!email.includes('@')) return;
+    const btn = event.currentTarget;
+    btn.textContent = 'جارٍ الإرسال...';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '✓ تم إرسال الرابط!';
+      btn.style.background = 'var(--sage)';
+    }, 1400);
+  }
+
+  function socialLogin(provider) {
+    const btn = event.currentTarget;
+    btn.style.opacity = '0.6';
+    btn.textContent = 'جارٍ الاتصال...';
+    setTimeout(() => { window.location='waraq-app.html'; }, 1200);
+  }
+</script>
+</body>
+</html>

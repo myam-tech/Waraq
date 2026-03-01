@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورق — أصدقائي</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#1a1209; --cream:#f5f0e8; --warm:#f0e6d0;
+    --gold:#c9973a; --gold-light:#e8b84b; --rust:#b84c2a;
+    --sage:#4a7c59; --muted:#8c7b68; --card-bg:#fffdf7;
+    --border:rgba(139,110,60,0.15);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;}
+
+  .app-shell{display:flex;height:100vh;max-width:1400px;margin:0 auto;}
+
+  /* SIDEBAR */
+  .sidebar{width:260px;flex-shrink:0;background:var(--ink);padding:32px 24px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;}
+  .sidebar::before{content:'';position:absolute;top:-100px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(201,151,58,.12) 0%,transparent 70%);pointer-events:none;}
+  .logo{display:flex;align-items:center;gap:12px;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .logo-icon{width:44px;height:44px;background:var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Amiri',serif;font-size:22px;color:var(--ink);font-weight:700;}
+  .logo-text{font-family:'Amiri',serif;font-size:26px;color:var(--cream);line-height:1;}
+  .logo-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+  .nav-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:10px;cursor:pointer;color:rgba(255,255,255,.5);font-size:14px;transition:all .2s;text-decoration:none;}
+  .nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+  .nav-item.active{background:rgba(201,151,58,.15);color:var(--gold-light);font-weight:600;}
+  .nav-icon{width:20px;height:20px;flex-shrink:0;}
+  .nav-section-label{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:2px;text-transform:uppercase;padding:16px 16px 6px;}
+  .sidebar-bottom{margin-top:auto;border-top:1px solid rgba(255,255,255,.08);padding-top:20px;}
+  .user-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:10px;cursor:pointer;transition:background .2s;}
+  .user-row:hover{background:rgba(255,255,255,.06);}
+  .u-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--rust));display:flex;align-items:center;justify-content:center;font-size:15px;color:white;font-weight:700;}
+  .u-name{font-size:13px;color:rgba(255,255,255,.8);font-weight:500;}
+  .u-st{font-size:11px;color:var(--gold);margin-top:1px;}
+
+  /* MAIN */
+  .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+  .main::-webkit-scrollbar{width:4px;}
+  .main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+  /* PAGE HEADER */
+  .page-header{background:var(--ink);padding:32px 48px 28px;position:relative;overflow:hidden;flex-shrink:0;}
+  .page-header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 30px,rgba(201,151,58,.04) 30px,rgba(201,151,58,.04) 31px),repeating-linear-gradient(-45deg,transparent,transparent 30px,rgba(201,151,58,.04) 30px,rgba(201,151,58,.04) 31px);pointer-events:none;}
+  .page-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(transparent,var(--cream));}
+  .ph-row{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+  .ph-left{}
+  .ph-title{font-family:'Amiri',serif;font-size:32px;color:var(--cream);margin-bottom:4px;}
+  .ph-sub{font-size:13px;color:rgba(240,230,208,.45);line-height:1.6;}
+  .ph-search{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 16px;min-width:260px;transition:all .2s;}
+  .ph-search:focus-within{border-color:rgba(201,151,58,.4);background:rgba(201,151,58,.06);}
+  .ph-search input{border:none;background:transparent;outline:none;font-size:13px;color:var(--cream);font-family:'IBM Plex Sans Arabic',sans-serif;width:100%;}
+  .ph-search input::placeholder{color:rgba(255,255,255,.3);}
+  .ph-search svg{width:14px;height:14px;color:rgba(255,255,255,.3);flex-shrink:0;}
+
+  /* TABS */
+  .page-tabs{display:flex;padding:0 48px;background:var(--card-bg);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;}
+  .ptab{padding:16px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;font-family:'IBM Plex Sans Arabic',sans-serif;background:none;border-top:none;border-left:none;border-right:none;}
+  .ptab:hover{color:var(--ink);}
+  .ptab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:700;}
+  .ptab .badge{display:inline-block;margin-right:5px;background:var(--rust);color:white;padding:1px 6px;border-radius:100px;font-size:10px;font-weight:700;}
+  .ptab.active .badge{background:var(--gold);color:var(--ink);}
+
+  /* BODY */
+  .page-body{display:flex;flex:1;gap:0;padding:28px 48px;overflow:hidden;}
+  .feed-col{flex:1;overflow-y:auto;padding-left:28px;}
+  .feed-col::-webkit-scrollbar{display:none;}
+  .right-col{width:290px;flex-shrink:0;display:flex;flex-direction:column;gap:16px;overflow-y:auto;}
+  .right-col::-webkit-scrollbar{display:none;}
+
+  /* ACTIVITY FEED */
+  .activity-item{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--border);animation:fadeUp .4s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .activity-item:nth-child(1){animation-delay:.04s}
+  .activity-item:nth-child(2){animation-delay:.08s}
+  .activity-item:nth-child(3){animation-delay:.12s}
+  .activity-item:nth-child(4){animation-delay:.16s}
+  .activity-item:nth-child(5){animation-delay:.20s}
+  .activity-item:nth-child(6){animation-delay:.24s}
+  .activity-item:last-child{border-bottom:none;}
+
+  .ai-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:white;flex-shrink:0;}
+  .ai-body{flex:1;}
+  .ai-header{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+  .ai-name{font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;}
+  .ai-name:hover{color:var(--gold);}
+  .ai-action{font-size:13px;color:var(--muted);}
+  .ai-time{font-size:11px;color:var(--muted);margin-right:auto;}
+
+  /* ACTIVITY CARD CONTENT */
+  .ai-card{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:4px;}
+  .ac-top{padding:12px 16px;display:flex;align-items:center;gap:10px;}
+  .ac-type{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+  .act-book{color:var(--sage);}
+  .act-podcast{color:#7b3cc8;}
+  .act-quote{color:var(--gold);}
+  .ac-title{font-size:13px;font-weight:600;color:var(--ink);}
+  .ac-excerpt{font-family:'Amiri',serif;font-size:15px;line-height:1.8;color:var(--ink);padding:0 16px 12px;border-right:3px solid var(--gold);margin:0 16px 12px;}
+  .ac-comment-box{background:linear-gradient(135deg,rgba(201,151,58,.07),rgba(201,151,58,.03));padding:10px 16px;border-top:1px solid rgba(201,151,58,.1);}
+  .acb-label{font-size:9px;color:var(--gold);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;}
+  .acb-text{font-size:12px;color:var(--ink);line-height:1.6;}
+
+  .ai-card-actions{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;}
+  .aca-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--muted);font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .2s;}
+  .aca-btn:hover{border-color:var(--gold);color:var(--ink);}
+  .aca-btn.liked{border-color:var(--rust);color:var(--rust);background:rgba(184,76,42,.05);}
+  .aca-btn svg{width:13px;height:13px;}
+  .aca-share{margin-right:auto;font-size:12px;color:var(--muted);cursor:pointer;transition:color .15s;}
+  .aca-share:hover{color:var(--gold);}
+
+  /* STREAK ACTIVITY (simple) */
+  .streak-activity{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--warm);border-radius:12px;border:1px solid rgba(201,151,58,.2);margin-top:4px;}
+  .sa-icon{font-size:22px;}
+  .sa-text{font-size:13px;color:var(--ink);}
+  .sa-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  /* TABS CONTENT */
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  /* FRIENDS GRID */
+  .friends-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding-bottom:28px;}
+  .friend-card{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;transition:all .25s;cursor:pointer;animation:fadeUp .4s ease both;}
+  .friend-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(26,18,9,.1);}
+  .fc-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:white;position:relative;}
+  .fc-online{position:absolute;bottom:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--sage);border:2px solid var(--card-bg);}
+  .fc-name{font-size:14px;font-weight:700;color:var(--ink);}
+  .fc-handle{font-size:11px;color:var(--muted);}
+  .fc-stats{display:flex;gap:16px;}
+  .fcs-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .fcs-num{font-family:'Amiri',serif;font-size:18px;color:var(--ink);font-weight:700;}
+  .fcs-label{font-size:10px;color:var(--muted);}
+  .fc-interests{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
+  .fc-int{padding:3px 8px;border-radius:100px;font-size:10px;background:var(--warm);border:1px solid var(--border);color:var(--muted);}
+  .fc-follow-btn{width:100%;padding:8px;border-radius:100px;background:var(--ink);color:var(--gold-light);border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .2s;}
+  .fc-follow-btn:hover{background:var(--gold);color:var(--ink);}
+  .fc-follow-btn.following{background:transparent;color:var(--muted);border:1.5px solid var(--border);}
+  .fc-follow-btn.following:hover{border-color:var(--rust);color:var(--rust);}
+
+  /* DISCOVER TAB */
+  .discover-section-title{font-family:'Amiri',serif;font-size:18px;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+  .discover-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* LEADERBOARD */
+  .leaderboard-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;cursor:pointer;transition:all .2s;animation:fadeUp .4s ease both;}
+  .leaderboard-item:hover{transform:translateX(-3px);box-shadow:0 6px 20px rgba(26,18,9,.07);}
+  .lb-rank{font-family:'Amiri',serif;font-size:22px;color:var(--muted);width:32px;text-align:center;flex-shrink:0;}
+  .lb-rank.gold-rank{color:var(--gold);}
+  .lb-rank.silver-rank{color:#a8a8a8;}
+  .lb-rank.bronze-rank{color:#c07840;}
+  .lb-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:white;flex-shrink:0;}
+  .lb-info{flex:1;}
+  .lb-name{font-size:14px;font-weight:600;color:var(--ink);}
+  .lb-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  .lb-score{text-align:left;}
+  .lb-pts{font-family:'Amiri',serif;font-size:20px;color:var(--gold);}
+  .lb-pts-label{font-size:10px;color:var(--muted);}
+
+  /* RIGHT WIDGETS */
+  .widget{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:18px;}
+  .widget-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;}
+
+  .suggest-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .suggest-item:last-child{border-bottom:none;}
+  .si-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0;}
+  .si-name{font-size:13px;font-weight:500;color:var(--ink);}
+  .si-mutual{font-size:10px;color:var(--muted);margin-top:1px;}
+  .si-follow{margin-right:auto;font-size:12px;color:var(--gold);font-weight:600;cursor:pointer;transition:opacity .15s;}
+  .si-follow:hover{opacity:.7;}
+  .si-follow.done{color:var(--sage);}
+
+  /* COMMON INTERESTS WIDGET */
+  .interest-match{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:var(--warm);margin-bottom:8px;cursor:pointer;transition:background .15s;}
+  .interest-match:hover{background:rgba(201,151,58,.1);}
+  .im-icon{font-size:18px;flex-shrink:0;}
+  .im-name{font-size:13px;font-weight:500;color:var(--ink);}
+  .im-count{font-size:11px;color:var(--muted);margin-top:1px;}
+  .im-chevron{margin-right:auto;color:var(--muted);font-size:12px;}
+
+  /* INVITE */
+  .invite-card{background:linear-gradient(135deg,var(--ink),#2d1f0e);border-radius:16px;padding:20px;text-align:center;}
+  .ic-icon{font-size:36px;margin-bottom:10px;}
+  .ic-title{font-family:'Amiri',serif;font-size:18px;color:var(--cream);margin-bottom:6px;}
+  .ic-sub{font-size:12px;color:rgba(240,230,208,.5);line-height:1.6;margin-bottom:16px;}
+  .ic-btn{width:100%;padding:10px;background:var(--gold);color:var(--ink);border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .2s;}
+  .ic-btn:hover{background:var(--gold-light);}
+
+  @media(max-width:1100px){.right-col{display:none;}}
+  @media(max-width:768px){.sidebar{display:none;}.page-body{padding:20px;}.friends-grid{grid-template-columns:1fr;}.page-header{padding:24px 20px 20px;}.page-tabs{padding:0 20px;}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">و</div>
+      <div><div class="logo-text">ورق</div><div class="logo-sub">Waraq · Microlearning</div></div>
+    </div>
+    <a class="nav-item" href="waraq-app.html"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>الرئيسية</a>
+    <a class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>اكتشف</a>
+    <a class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>مكتبتي</a>
+    <a class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23,7 16,12 23,17"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>البودكاست</a>
+    <div class="nav-section-label">مجتمع</div>
+    <a class="nav-item active"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>أصدقائي</a>
+    <a class="nav-item" href="waraq-profile.html"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>ملفي الشخصي</a>
+    <a class="nav-item"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/></svg>المحفوظات</a>
+    <div class="nav-section-label">نشر</div>
+    <a class="nav-item" href="waraq-submit.html"><svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>إضافة محتوى</a>
+    <div class="sidebar-bottom">
+      <div class="user-row"><div class="u-av">م</div><div><div class="u-name">محمد العمري</div><div class="u-st">🔥 ١٤ يوماً متتالياً</div></div></div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="ph-row">
+        <div class="ph-left">
+          <div class="ph-title">أصدقائي 👥</div>
+          <div class="ph-sub">تابع نشاط دائرتك المعرفية وشارك ما يُلهمك</div>
+        </div>
+        <div class="ph-search">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" placeholder="ابحث عن صديق...">
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="page-tabs">
+      <button class="ptab active" id="tab-activity" onclick="switchTab('activity',this)">النشاط <span class="badge">٥</span></button>
+      <button class="ptab" id="tab-friends" onclick="switchTab('friends',this)">أتابعهم (١١٢)</button>
+      <button class="ptab" id="tab-followers" onclick="switchTab('followers',this)">يتابعونني (٣٤٧)</button>
+      <button class="ptab" id="tab-discover" onclick="switchTab('discover',this)">اكتشف</button>
+      <button class="ptab" id="tab-leaderboard" onclick="switchTab('leaderboard',this)">🏆 المتصدرون</button>
+    </div>
+
+    <!-- BODY -->
+    <div class="page-body">
+      <div class="feed-col">
+
+        <!-- ACTIVITY TAB -->
+        <div class="tab-content active" id="content-activity">
+
+          <div class="activity-item">
+            <div class="ai-avatar" style="background:linear-gradient(135deg,#2d6a4a,#1b4332)">س</div>
+            <div class="ai-body">
+              <div class="ai-header">
+                <span class="ai-name">سارة الحمدي</span>
+                <span class="ai-action">شاركت مقتطفاً جديداً</span>
+                <span class="ai-time">منذ ٣٠ دقيقة</span>
+              </div>
+              <div class="ai-card">
+                <div class="ac-top"><span class="ac-type act-book">📚 كتاب</span><span class="ac-title">تفكير بطيء وآخر سريع</span></div>
+                <div class="ac-excerpt">"الجهاز الأول يعمل تلقائياً وسريعاً، بينما الجهاز الثاني يستهلك جهداً ذهنياً أكبر. معظم أخطائنا تحدث حين يتحكم الجهاز الأول في قرارات تستحق تفكيراً عميقاً."</div>
+                <div class="ac-comment-box">
+                  <div class="acb-label">تعليق سارة</div>
+                  <div class="acb-text">هذا يفسّر لماذا نتخذ قرارات متسرّعة في لحظات الضغط — مهم جداً للوعي الذاتي.</div>
+                </div>
+                <div class="ai-card-actions">
+                  <button class="aca-btn liked" onclick="this.classList.toggle('liked')"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>٦٤</button>
+                  <button class="aca-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>١٢</button>
+                  <button class="aca-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>حفظ</button>
+                  <span class="aca-share">مشاركة ↗</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="ai-avatar" style="background:linear-gradient(135deg,#9b2226,#6a0000)">ع</div>
+            <div class="ai-body">
+              <div class="ai-header">
+                <span class="ai-name">عمر الشمري</span>
+                <span class="ai-action">أكمل سلسلة ٣٠ يوماً 🎉</span>
+                <span class="ai-time">منذ ساعة</span>
+              </div>
+              <div class="streak-activity">
+                <div class="sa-icon">🔥</div>
+                <div><div class="sa-text"><strong>عمر</strong> أتمّ ٣٠ يوماً متتالية من التعلم!</div><div class="sa-sub">حقّق شارة "المواظب" الذهبية</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="ai-avatar" style="background:linear-gradient(135deg,#1d3d8f,#0d1f5c)">ن</div>
+            <div class="ai-body">
+              <div class="ai-header">
+                <span class="ai-name">نورة القحطاني</span>
+                <span class="ai-action">علّقت على بودكاست</span>
+                <span class="ai-time">منذ ٢ ساعة</span>
+              </div>
+              <div class="ai-card">
+                <div class="ac-top"><span class="ac-type act-podcast">🎙 بودكاست</span><span class="ac-title">عقول ومعرفة — الذاكرة</span></div>
+                <div class="ac-excerpt">"الذاكرة ليست كاميرا تصوير — بل هي عملية إعادة بناء نشطة في كل مرة تتذكر فيها."</div>
+                <div class="ac-comment-box">
+                  <div class="acb-label">تعليق نورة</div>
+                  <div class="acb-text">مقطع مذهل! يفسّر لماذا تتغير قصصنا عن نفس الحادثة كلما أعدنا رواءيتها.</div>
+                </div>
+                <div class="ai-card-actions">
+                  <button class="aca-btn" onclick="this.classList.toggle('liked')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>٣٨</button>
+                  <button class="aca-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>٧</button>
+                  <button class="aca-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>حفظ</button>
+                  <span class="aca-share">مشاركة ↗</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="ai-avatar" style="background:linear-gradient(135deg,#7b4d12,#4a2c08)">خ</div>
+            <div class="ai-body">
+              <div class="ai-header">
+                <span class="ai-name">خالد الدوسري</span>
+                <span class="ai-action">حفظ حكمة</span>
+                <span class="ai-time">منذ ٣ ساعات</span>
+              </div>
+              <div class="ai-card">
+                <div class="ac-top"><span class="ac-type act-quote">💡 حكمة</span></div>
+                <div class="ac-excerpt">"ازرع فكرة تحصد عملاً، ازرع عملاً تحصد عادةً، ازرع عادةً تحصد شخصيةً، ازرع شخصيةً تحصد مصيراً."</div>
+                <div class="ai-card-actions">
+                  <button class="aca-btn" onclick="this.classList.toggle('liked')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>٩٢</button>
+                  <button class="aca-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>١٨</button>
+                  <button class="aca-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>حفظ</button>
+                  <span class="aca-share">مشاركة ↗</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="ai-avatar" style="background:linear-gradient(135deg,#5e3494,#3d1f6e)">ر</div>
+            <div class="ai-body">
+              <div class="ai-header">
+                <span class="ai-name">ريم الزهراني</span>
+                <span class="ai-action">أضافت كتاباً لمكتبتها</span>
+                <span class="ai-time">منذ ٤ ساعات</span>
+              </div>
+              <div class="streak-activity" style="background:rgba(94,52,148,.07);border-color:rgba(94,52,148,.2);">
+                <div class="sa-icon">📚</div>
+                <div><div class="sa-text">أضافت <strong>"النشوء والارتقاء"</strong> لقائمة قراءتها</div><div class="sa-sub">الكتاب ٢٤ في مكتبتها</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- FRIENDS TAB -->
+        <div class="tab-content" id="content-friends">
+          <div class="friends-grid">
+            <div class="friend-card" style="animation-delay:.05s">
+              <div class="fc-avatar" style="background:linear-gradient(135deg,#2d6a4a,#1b4332)"><div class="fc-online"></div>س</div>
+              <div class="fc-name">سارة الحمدي</div>
+              <div class="fc-handle">@sarah.hamdi</div>
+              <div class="fc-stats">
+                <div class="fcs-item"><div class="fcs-num">١٤٢</div><div class="fcs-label">مشاركة</div></div>
+                <div class="fcs-item"><div class="fcs-num" style="color:var(--gold)">٢١🔥</div><div class="fcs-label">سلسلة</div></div>
+                <div class="fcs-item"><div class="fcs-num">٤٨٢</div><div class="fcs-label">متابع</div></div>
+              </div>
+              <div class="fc-interests"><span class="fc-int">علم نفس</span><span class="fc-int">فلسفة</span><span class="fc-int">تاريخ</span></div>
+              <button class="fc-follow-btn following" onclick="toggleFollow(this)">✓ تتابعينها</button>
+            </div>
+            <div class="friend-card" style="animation-delay:.10s">
+              <div class="fc-avatar" style="background:linear-gradient(135deg,#9b2226,#6a0000)">ع</div>
+              <div class="fc-name">عمر الشمري</div>
+              <div class="fc-handle">@omar.shamri</div>
+              <div class="fc-stats">
+                <div class="fcs-item"><div class="fcs-num">٩٨</div><div class="fcs-label">مشاركة</div></div>
+                <div class="fcs-item"><div class="fcs-num" style="color:var(--gold)">٣٠🔥</div><div class="fcs-label">سلسلة</div></div>
+                <div class="fcs-item"><div class="fcs-num">٢١٣</div><div class="fcs-label">متابع</div></div>
+              </div>
+              <div class="fc-interests"><span class="fc-int">ريادة</span><span class="fc-int">تطوير ذات</span></div>
+              <button class="fc-follow-btn following" onclick="toggleFollow(this)">✓ تتابعه</button>
+            </div>
+            <div class="friend-card" style="animation-delay:.15s">
+              <div class="fc-avatar" style="background:linear-gradient(135deg,#1d3d8f,#0d1f5c)"><div class="fc-online"></div>ن</div>
+              <div class="fc-name">نورة القحطاني</div>
+              <div class="fc-handle">@noura.q</div>
+              <div class="fc-stats">
+                <div class="fcs-item"><div class="fcs-num">٦٧</div><div class="fcs-label">مشاركة</div></div>
+                <div class="fcs-item"><div class="fcs-num" style="color:var(--gold)">٧🔥</div><div class="fcs-label">سلسلة</div></div>
+                <div class="fcs-item"><div class="fcs-num">١٥٦</div><div class="fcs-label">متابع</div></div>
+              </div>
+              <div class="fc-interests"><span class="fc-int">علوم</span><span class="fc-int">أدب</span><span class="fc-int">بودكاست</span></div>
+              <button class="fc-follow-btn following" onclick="toggleFollow(this)">✓ تتابعينها</button>
+            </div>
+            <div class="friend-card" style="animation-delay:.20s">
+              <div class="fc-avatar" style="background:linear-gradient(135deg,#7b4d12,#4a2c08)">خ</div>
+              <div class="fc-name">خالد الدوسري</div>
+              <div class="fc-handle">@khalid.d</div>
+              <div class="fc-stats">
+                <div class="fcs-item"><div class="fcs-num">٢٣١</div><div class="fcs-label">مشاركة</div></div>
+                <div class="fcs-item"><div class="fcs-num" style="color:var(--gold)">١٢🔥</div><div class="fcs-label">سلسلة</div></div>
+                <div class="fcs-item"><div class="fcs-num">٧٣٤</div><div class="fcs-label">متابع</div></div>
+              </div>
+              <div class="fc-interests"><span class="fc-int">تراث</span><span class="fc-int">فلسفة</span></div>
+              <button class="fc-follow-btn following" onclick="toggleFollow(this)">✓ تتابعه</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DISCOVER TAB -->
+        <div class="tab-content" id="content-discover">
+          <div class="discover-section-title">يشاركونك الاهتمامات</div>
+          <div class="friends-grid">
+            <div class="friend-card">
+              <div class="fc-avatar" style="background:linear-gradient(135deg,#5e3494,#3d1f6e)">ر</div>
+              <div class="fc-name">ريم الزهراني</div>
+              <div class="fc-handle">@reem.z · ٨ اهتمامات مشتركة</div>
+              <div class="fc-stats">
+                <div class="fcs-item"><div class="fcs-num">١٨٩</div><div class="fcs-label">مشاركة</div></div>
+                <div class="fcs-item"><div class="fcs-num">٨٩١</div><div class="fcs-label">متابع</div></div>
+              </div>
+              <div class="fc-interests"><span class="fc-int">علوم</span><span class="fc-int">تاريخ</span><span class="fc-int">فلسفة</span></div>
+              <button class="fc-follow-btn" onclick="toggleFollow(this)">+ متابعة</button>
+            </div>
+            <div class="friend-card">
+              <div class="fc-avatar" style="background:linear-gradient(135deg,#1a4a6e,#0d2d45)">ف</div>
+              <div class="fc-name">فيصل العتيبي</div>
+              <div class="fc-handle">@faisal.o · ٦ اهتمامات مشتركة</div>
+              <div class="fc-stats">
+                <div class="fcs-item"><div class="fcs-num">٧٤</div><div class="fcs-label">مشاركة</div></div>
+                <div class="fcs-item"><div class="fcs-num">٣٤٢</div><div class="fcs-label">متابع</div></div>
+              </div>
+              <div class="fc-interests"><span class="fc-int">تقنية</span><span class="fc-int">علوم</span></div>
+              <button class="fc-follow-btn" onclick="toggleFollow(this)">+ متابعة</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LEADERBOARD TAB -->
+        <div class="tab-content" id="content-leaderboard">
+          <div class="discover-section-title">🏆 المتصدرون هذا الشهر</div>
+
+          <div class="leaderboard-item" style="animation-delay:.04s">
+            <div class="lb-rank gold-rank">١</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,#2d6a4a,#1b4332)">س</div>
+            <div class="lb-info"><div class="lb-name">سارة الحمدي</div><div class="lb-sub">٢١ يوم سلسلة · ٤٢ مشاركة هذا الشهر</div></div>
+            <div class="lb-score"><div class="lb-pts">٢٤٨٠</div><div class="lb-pts-label">نقطة</div></div>
+          </div>
+          <div class="leaderboard-item" style="animation-delay:.08s">
+            <div class="lb-rank silver-rank">٢</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,#7b4d12,#4a2c08)">خ</div>
+            <div class="lb-info"><div class="lb-name">خالد الدوسري</div><div class="lb-sub">١٢ يوم سلسلة · ٣١ مشاركة هذا الشهر</div></div>
+            <div class="lb-score"><div class="lb-pts">١٩٤٠</div><div class="lb-pts-label">نقطة</div></div>
+          </div>
+          <div class="leaderboard-item" style="animation-delay:.12s;background:rgba(201,151,58,.05);border-color:rgba(201,151,58,.25);">
+            <div class="lb-rank" style="color:var(--gold)">٣</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,var(--gold),var(--rust))">م</div>
+            <div class="lb-info"><div class="lb-name">محمد العمري <span style="font-size:10px;color:var(--gold);font-weight:700;">(أنت)</span></div><div class="lb-sub">١٤ يوم سلسلة · ٢٨ مشاركة هذا الشهر</div></div>
+            <div class="lb-score"><div class="lb-pts">١٧٦٠</div><div class="lb-pts-label">نقطة</div></div>
+          </div>
+          <div class="leaderboard-item" style="animation-delay:.16s">
+            <div class="lb-rank bronze-rank">٤</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,#9b2226,#6a0000)">ع</div>
+            <div class="lb-info"><div class="lb-name">عمر الشمري</div><div class="lb-sub">٣٠ يوم سلسلة · ١٦ مشاركة</div></div>
+            <div class="lb-score"><div class="lb-pts">١٥٢٠</div><div class="lb-pts-label">نقطة</div></div>
+          </div>
+          <div class="leaderboard-item" style="animation-delay:.20s">
+            <div class="lb-rank">٥</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,#1d3d8f,#0d1f5c)">ن</div>
+            <div class="lb-info"><div class="lb-name">نورة القحطاني</div><div class="lb-sub">٧ أيام سلسلة · ٢٢ مشاركة</div></div>
+            <div class="lb-score"><div class="lb-pts">١٣٨٠</div><div class="lb-pts-label">نقطة</div></div>
+          </div>
+        </div>
+
+        <!-- FOLLOWERS TAB -->
+        <div class="tab-content" id="content-followers">
+          <div class="friends-grid">
+            <div class="friend-card"><div class="fc-avatar" style="background:linear-gradient(135deg,#2a5e3a,#163d24)">ع</div><div class="fc-name">عبدالله السالم</div><div class="fc-handle">@abd.salem</div><div class="fc-stats"><div class="fcs-item"><div class="fcs-num">٥٤</div><div class="fcs-label">مشاركة</div></div><div class="fcs-item"><div class="fcs-num">١٨٩</div><div class="fcs-label">متابع</div></div></div><button class="fc-follow-btn" onclick="toggleFollow(this)">+ متابعة</button></div>
+            <div class="friend-card"><div class="fc-avatar" style="background:linear-gradient(135deg,#4a1a6e,#2d0f4a)">م</div><div class="fc-name">مريم الغامدي</div><div class="fc-handle">@maryam.g</div><div class="fc-stats"><div class="fcs-item"><div class="fcs-num">١٢١</div><div class="fcs-label">مشاركة</div></div><div class="fcs-item"><div class="fcs-num">٤٣٠</div><div class="fcs-label">متابع</div></div></div><button class="fc-follow-btn following" onclick="toggleFollow(this)">✓ تتابعينها</button></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COL -->
+      <div class="right-col">
+
+        <div class="widget">
+          <div class="widget-title">🔍 مقترح لك</div>
+          <div class="suggest-item">
+            <div class="si-av" style="background:linear-gradient(135deg,#5e3494,#3d1f6e)">ر</div>
+            <div><div class="si-name">ريم الزهراني</div><div class="si-mutual">٨ اهتمامات مشتركة</div></div>
+            <div class="si-follow" onclick="followToggle(this)">+ تابع</div>
+          </div>
+          <div class="suggest-item">
+            <div class="si-av" style="background:linear-gradient(135deg,#1a4a6e,#0d2d45)">ف</div>
+            <div><div class="si-name">فيصل العتيبي</div><div class="si-mutual">٥ أصدقاء مشتركون</div></div>
+            <div class="si-follow" onclick="followToggle(this)">+ تابع</div>
+          </div>
+          <div class="suggest-item">
+            <div class="si-av" style="background:linear-gradient(135deg,#2a5e3a,#163d24)">ه</div>
+            <div><div class="si-name">هند المطيري</div><div class="si-mutual">٣ أصدقاء مشتركون</div></div>
+            <div class="si-follow" onclick="followToggle(this)">+ تابع</div>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-title">💡 اهتماماتك المشتركة</div>
+          <div class="interest-match"><div class="im-icon">🧠</div><div><div class="im-name">علم النفس</div><div class="im-count">٢٤ صديق مهتم</div></div><div class="im-chevron">←</div></div>
+          <div class="interest-match"><div class="im-icon">📚</div><div><div class="im-name">أدب عربي</div><div class="im-count">١٨ صديق مهتم</div></div><div class="im-chevron">←</div></div>
+          <div class="interest-match"><div class="im-icon">💡</div><div><div class="im-name">فلسفة</div><div class="im-count">١٥ صديق مهتم</div></div><div class="im-chevron">←</div></div>
+          <div class="interest-match"><div class="im-icon">🔬</div><div><div class="im-name">علوم</div><div class="im-count">١١ صديق مهتم</div></div><div class="im-chevron">←</div></div>
+        </div>
+
+        <div class="invite-card">
+          <div class="ic-icon">📩</div>
+          <div class="ic-title">ادعُ أصدقاءك</div>
+          <div class="ic-sub">شارك رابط الدعوة واكسب نقاطاً إضافية لكل صديق ينضم</div>
+          <button class="ic-btn">نسخ رابط الدعوة</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tab, el) {
+    document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('content-'+tab).classList.add('active');
+  }
+
+  function toggleFollow(btn) {
+    const isFollowing = btn.classList.contains('following');
+    btn.classList.toggle('following');
+    btn.textContent = isFollowing ? '+ متابعة' : '✓ تتابعه';
+  }
+
+  function followToggle(el) {
+    if(el.classList.contains('done')) { el.textContent='+ تابع'; el.classList.remove('done'); }
+    else { el.textContent='✓ يُتابع'; el.classList.add('done'); }
+  }
+
+  // Like buttons
+  document.querySelectorAll('.aca-btn').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      if(this.querySelector('svg[fill="none"]')?.querySelector('path[d*="20.84"]')) {
+        this.classList.toggle('liked');
+      }
+    });
+  });
+</script>
+</body>
+</html>
